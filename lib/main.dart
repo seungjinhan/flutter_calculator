@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_my_calc/ui/cals_function_button.dart';
+import 'package:flutter_my_calc/ui/num_button.dart';
 
 void main() => runApp(MyApp());
 
@@ -32,30 +34,67 @@ class _CalsState extends State<Cals> {
   Key _mul = Key("mul");
   Key _div = Key("div");
   Key _clear = Key("clear");
-  Key _back = Key("back");
-  Key _selectKey;
+  Key _reversely = Key("reversely");
+  Key _rest = Key("rest");
+  Key _point = Key("point");
+  Key _equal = Key("equal");
 
   TextEditingController _textEditingController;
   var height;
   var width;
 
-  NumButton numButton(String str, Key key) {
+  NumButton _numButton(String str, Key key) {
     return NumButton(
-      child: Text(
-        str,
-        style: TextStyle(fontSize: 50.0),
-      ),
+      str: str,
       key: key,
       callBack: () {},
     );
   }
 
-  CalsButton calsButton(String str, Key key) {
-    return CalsButton(
+  CalsFunctionButton _calsFunctionKey(String str, Key key) {
+    return CalsFunctionButton(
       key: key,
       str: str,
       callBack: () {},
       isAct: false,
+    );
+  }
+
+  Widget _makeMiddleKey(List<String> nameList, List<Key> numKeyList) {
+    return Expanded(
+      child: Row(
+        children: <Widget>[
+          _numButton(nameList[0], numKeyList[0]),
+          _numButton(nameList[1], numKeyList[1]),
+          _numButton(nameList[2], numKeyList[2]),
+          _calsFunctionKey(nameList[3], numKeyList[3]),
+        ],
+      ),
+    );
+  }
+
+  Widget _makeTopKey(List<String> nameList, List<Key> numKeyList) {
+    return Expanded(
+      child: Row(
+        children: <Widget>[
+          _calsFunctionKey(nameList[0], numKeyList[0]),
+          _calsFunctionKey(nameList[1], numKeyList[1]),
+          _calsFunctionKey(nameList[2], numKeyList[2]),
+          _calsFunctionKey(nameList[3], numKeyList[3]),
+        ],
+      ),
+    );
+  }
+
+  Widget _makeBottomKey(List<String> nameList, List<Key> numKeyList) {
+    return Expanded(
+      child: Row(
+        children: <Widget>[
+          _numButton(nameList[0], numKeyList[0]),
+          _calsFunctionKey(nameList[1], numKeyList[1]),
+          _calsFunctionKey(nameList[2], numKeyList[2]),
+        ],
+      ),
     );
   }
 
@@ -71,6 +110,7 @@ class _CalsState extends State<Cals> {
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -83,12 +123,14 @@ class _CalsState extends State<Cals> {
               child: TextField(
                 controller: this._textEditingController,
                 enabled: true,
+                cursorColor: Colors.transparent,
                 autofocus: true,
                 textAlign: TextAlign.right,
                 decoration: InputDecoration.collapsed(
                     hintText: "0",
                     hintStyle: TextStyle(fontSize: 60.0),
-                    border: UnderlineInputBorder()),
+                    border: OutlineInputBorder(),
+                    fillColor: Colors.teal),
               ),
             ),
           ),
@@ -96,110 +138,20 @@ class _CalsState extends State<Cals> {
             child: Container(
               child: Column(
                 children: <Widget>[
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        numButton("1", _num1),
-                        numButton("2", _num2),
-                        numButton("3", _num3),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        numButton("4", _num4),
-                        numButton("5", _num5),
-                        numButton("6", _num6),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        numButton("7", _num7),
-                        numButton("8", _num8),
-                        numButton("9", _num9),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        calsButton("C", _clear),
-                        numButton("0", _num0),
-                        calsButton("<<", _back),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        calsButton("+", _add),
-                        calsButton("-", _sub),
-                        calsButton("*", _mul),
-                        calsButton("/", _div),
-                      ],
-                    ),
-                  ),
+                  _makeTopKey(
+                      ["C", "R", "%", "/"], [_clear, _reversely, _rest, _div]),
+                  _makeMiddleKey(
+                      ["7", "8", "9", "*"], [_num7, _num8, _num9, _mul]),
+                  _makeMiddleKey(
+                      ["4", "5", "6", "-"], [_num4, _num5, _num6, _sub]),
+                  _makeMiddleKey(
+                      ["1", "2", "3", "+"], [_num1, _num2, _num3, _add]),
+                  _makeBottomKey(["0", ".", "="], [_num0, _point, _equal]),
                 ],
               ),
             ),
           )
         ],
-      ),
-    );
-  }
-}
-
-class CalsButton extends StatelessWidget {
-  final VoidCallback callBack;
-  final Key key;
-  final String str;
-  final bool isAct;
-
-  const CalsButton({this.callBack, this.key, this.str, this.isAct});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        alignment: Alignment.center,
-        child: GestureDetector(
-          onTap: () {},
-          child: CircleAvatar(
-            backgroundColor: isAct ? Colors.orange : Colors.transparent,
-            radius: 30,
-            child: Text(
-              str,
-              style: TextStyle(
-                  fontSize: 50.0,
-                  color: isAct ? Colors.transparent : Colors.orange),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class NumButton extends StatelessWidget {
-  final Widget child;
-  final Key key;
-  final VoidCallback callBack;
-
-  NumButton({this.child, this.key, this.callBack});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Material(
-        child: InkResponse(
-          child: Container(
-            alignment: Alignment.center,
-            child: child,
-          ),
-        ),
       ),
     );
   }
